@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iSol App</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center; /* Horizontal centering */
+            align-items: center;     /* Vertical centering */
+            text-align: center;      /* Center text alignment */
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 600px;
+            padding: 20px;
+            background-color: #C8BFE7; /* Updated color */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #user_data {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        function fetchUserData() {
+            fetch('/get_user_data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById("user_data").innerHTML = data.error;
+                    } else {
+                        document.getElementById("user_data").innerHTML = 
+                            `Username: ${data.username}<br>User ID: ${data.userid}`;
+                    }
+                })
+                .catch(error => {
+                    document.getElementById("user_data").innerHTML = "Error fetching data.";
+                });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>iSol Application!</h1>
+        <h2>GCP DevOps/SRE Engineer Assessment!</h2>
+        <p>Version: {{ version }}</p>
+        <p>Pod Name : {{ hostname }}</p>
+        <p>Owner : Irfath Ramiz</p>
+        <button onclick="fetchUserData()">Get User Data</button>
+        <div id="user_data"></div>
+    </div>
+</body>
+</html>

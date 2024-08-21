@@ -1,10 +1,10 @@
-from flask import Flask
+from flask import Flask, render_template, jsonify
 import os
 import mysql.connector
 
 app = Flask(__name__)
 
-# Database connectionS
+# Database connection
 db_config = {
     'host': os.getenv('DB_HOST'),
     'user': os.getenv('DB_USER'),
@@ -13,29 +13,28 @@ db_config = {
 }
 
 @app.route('/')
-def hello():
-    version = "1.0.0"
+def index():
+    version = "2.0.4"
     hostname = os.getenv('HOSTNAME', 'unknown')
+    return render_template('index.html', version=version, hostname=hostname)
 
+@app.route('/get_user_data')
+def get_user_data():
     try:
         conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor(dictionary=True)  
+        cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT username, userid FROM user LIMIT 1")
-        user_data = cursor.fetchone() 
+        user_data = cursor.fetchone()
         cursor.close()
         conn.close()
 
         if user_data:
-            username = user_data['username']
-            userid = user_data['userid']
-            user_info = f"Username: {username}<br>User ID: {userid}"
+            return jsonify(user_data)
         else:
-            user_info = "No user data found."
+            return jsonify({"error": "No user data found."})
 
     except mysql.connector.Error as err:
-        user_info = f"Error: {err}"
-
-    return f"Hello, world Irfath ISOL!<br>Version: {version}<br>Hostname: {hostname}<br>{user_info}"
+        return jsonify({"error": str(err)})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
